@@ -12,6 +12,9 @@
 
 ActiveRecord::Schema.define(version: 2020_11_17_114835) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "water_consumes", force: :cascade do |t|
     t.float "consume"
     t.float "measure"
