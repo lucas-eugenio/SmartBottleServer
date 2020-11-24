@@ -9,8 +9,10 @@ module Api
     def create
       water_consume = create_water_consume(params[:measure], params[:time])
       render json: { water_consume: water_consume }, status: :ok
+      return
     rescue StandardError => e
       render json: { error: e }, status: :bad_request
+      return
     end
 
     private
@@ -26,7 +28,7 @@ module Api
       consume = 0
       if last_water_consume.present?
         measure_diff = last_water_consume.measure - measure
-        consume = measure_diff.negative? ? last_water_consume.consume : last_water_consume.consume + measure_diff
+        consume = !measure_diff.positive? ? last_water_consume.consume : last_water_consume.consume + measure_diff
       end
 
       WaterConsume.create(liquid: 'Água', density: 1, measure: measure, consume: consume, time: time)
@@ -34,10 +36,12 @@ module Api
 
     def measure_error
       render json: { error: "Value Of 'measure' Is Mandatory" }, status: :bad_request
+      return
     end
 
     def time_error
       render json: { error: "Value Of 'time' Is Mandatory" }, status: :bad_request
+      return
     end
   end
 end
