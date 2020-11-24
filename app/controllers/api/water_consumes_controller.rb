@@ -4,9 +4,11 @@ module Api
   # controllers/api/WaterConsumesController
   class WaterConsumesController < ApplicationController
     skip_before_action :verify_authenticity_token
-    before_action :verify_params
 
     def create
+      return measure_error unless params[:measure].present?
+      return time_error unless params[:time].present?
+
       water_consume = create_water_consume(params[:measure], params[:time])
       render json: { water_consume: water_consume }, status: :ok
       return
@@ -16,11 +18,6 @@ module Api
     end
 
     private
-
-    def verify_params
-      measure_error unless params[:measure].present?
-      time_error unless params[:time].present?
-    end
 
     def create_water_consume(measure, time)
       last_water_consume = WaterConsume.last_from_day(params[:time].to_time).take
@@ -36,12 +33,10 @@ module Api
 
     def measure_error
       render json: { error: "Value Of 'measure' Is Mandatory" }, status: :bad_request
-      return
     end
 
     def time_error
       render json: { error: "Value Of 'time' Is Mandatory" }, status: :bad_request
-      return
     end
   end
 end
