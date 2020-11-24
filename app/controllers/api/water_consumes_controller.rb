@@ -21,7 +21,7 @@ module Api
     end
 
     def create_water_consume(measure, time)
-      last_water_consume = WaterConsume.last_from_day(params[:time].to_time)
+      last_water_consume = WaterConsume.last_from_day(params[:time].to_time).take
 
       consume = 0
       if last_water_consume.present?
