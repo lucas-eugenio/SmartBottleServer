@@ -1,8 +1,27 @@
 class HomeController < ActionController::Base
-    def index
-        @last_measure = "11/10/2010"
-        @today_drink = 400
-        @measures_label = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
-        @measures_data = [0, 0, 0, 0, 0, 0, 0, 0, 100, 150, 150, 500, 700, 750, 750, 1000, 1100, 1150, 1300, 1500, 2000, 2000, 2000, 2000]
+  def index
+    measures = get_measures
+    consume = last_consume
+
+    @last_measure = consume.present? ? consume.time.to_s.gsub('-0300', '') : 'Ainda Sem Medidas'
+    @today_drink = consume.present? ? consume.consume : 0
+    @measures_label = measures.map { |measure| measure[0] }
+    @measures_data = measures.map { |measure| measure[1] }
+  end
+
+  private
+
+  def last_consume
+    WaterConsume.last_from_day(Time.now).take
+  end
+  
+  def get_measures
+    measures = []
+    for hour in 0..Time.now.hour
+      water_consume = WaterConsume.last_from_hour(Time.now.change(hour: hour)).take
+      consume = water_consume.present? ? water_consume.consume : 0
+      measures << [hour, consume]
     end
+    measures
+  end
 end
