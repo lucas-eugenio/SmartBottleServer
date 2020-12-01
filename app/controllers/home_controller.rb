@@ -17,7 +17,7 @@ class HomeController < ActionController::Base
   
   def get_measures
     measures = []
-    for hour in 0..Time.now.hour
+    for hour in 0..Time.now.hour + 1
       water_consume = WaterConsume.last_from_hour(Time.now.change(hour: hour)).take
       consume = water_consume.present? ? water_consume.consume : 0
       measures << [hour, consume]
